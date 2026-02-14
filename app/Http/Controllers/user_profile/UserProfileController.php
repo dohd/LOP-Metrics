@@ -21,7 +21,10 @@ class UserProfileController extends Controller
      */
     public function index()
     {
-        $users = User::where('id', '!=', auth()->user()->id)->whereNotNull('created_by')->get();
+        $users = User::where('id', '!=', auth()->user()->id)
+            ->whereNotNull('created_by')
+            ->latest()
+            ->get();
         return view('user_profiles.index', compact('users'));
     }
 
