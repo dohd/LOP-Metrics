@@ -8,6 +8,7 @@ use App\Models\team\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -25,6 +26,7 @@ class UserProfileController extends Controller
             ->whereNotNull('created_by')
             ->latest()
             ->get();
+
         return view('user_profiles.index', compact('users'));
     }
 
@@ -126,6 +128,8 @@ class UserProfileController extends Controller
                 DB::beginTransaction();
                 
                 $input = $request->only(['fname', 'lname', 'email', 'phone', 'user_type', 'team_id']);
+                if (isset($input['phone'])) $input['password'] = $input['phone'];
+
                 // $role = Role::find($input['role_id']);
                 // $user_profile->syncRoles([$role->name]);
                 // dd($input);
@@ -167,7 +171,7 @@ class UserProfileController extends Controller
     public function active_profile()
     {
         $user_profile = auth()->user();
-        $role = $user_profile->roles()->first() ?: new Role;
+        $role = $user_profile->roles()->first() ?? new Role;
         
         return view('user_profiles.active_profile', compact('user_profile', 'role'));
     }

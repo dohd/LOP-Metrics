@@ -60,7 +60,9 @@ class User extends Authenticatable
      */
     public function setPasswordAttribute($password)
     {
-        if ($password) $this->attributes['password'] = Hash::make($password);
+        if ($password) {
+            $this->attributes['password'] = Hash::make($password);
+        }
     }
 
     /**
@@ -70,10 +72,12 @@ class User extends Authenticatable
     {
         parent::boot();
 
-        static::creating(function ($instance) {
-            $instance->created_by = auth()->user()->id;
-            $instance->ins = auth()->user()->ins;
-            return $instance;
+        static::creating(function ($model) {
+            if (auth()->id()) {
+                $model->created_by = auth()->user()->id;
+                $model->ins = auth()->user()->ins;                
+            }
+            return $model;
         });
 
         static::addGlobalScope('ins', function ($builder) {
