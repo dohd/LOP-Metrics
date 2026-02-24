@@ -9,6 +9,7 @@ use App\Models\programme\Programme;
 use App\Models\team\TeamSize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class AssignScoreController extends Controller
@@ -164,7 +165,7 @@ class AssignScoreController extends Controller
             
             return response()->json(['flash_success' => 'Computed Scores reset successfully']);
         } catch (\Throwable $th) {
-            \Log::error($th->getMessage());
+            Log::error($th->getMessage());
             return response()->json(['flash_error' => 'Something went wrong. Error reseting computed scores!']);
         }
     }
