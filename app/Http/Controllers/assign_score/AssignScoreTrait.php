@@ -77,7 +77,7 @@ trait AssignScoreTrait
                     $team->points = 0;
                     $team->extra_points = 0;
                     $team->accrued_amount = 0;
-                    foreach ($metrics as $i => $metric) {
+                    foreach ($metrics as $metric) {
                         if ($metric->team_id == $team->id) {
                             $metricDate = Carbon::parse($metric->date);
                             $programmeDeadline = Carbon::parse($programme->amount_perc_by);
@@ -92,7 +92,7 @@ trait AssignScoreTrait
                     $team->accrued_amount += $teamCumulatedAmount;
 
                     // scoring bands
-                    $bands = json_decode($programme->bandjson) ?: [];
+                    $bands = json_decode($programme->bandjson) ?? [];
                     foreach ($bands as $key => $band) {
                     	$conditionalAmount = round($band->threshold / 100 * $programme->target_amount);
                     	if ($team->accrued_amount >= $conditionalAmount) {
@@ -114,6 +114,10 @@ trait AssignScoreTrait
 
                     $team->net_points = $team->points + $team->extra_points;
                     $modTeams->push($team);
+                }
+                $valid_teams = $modTeams->filter(fn($v) => $v->points > 0);
+                if (!count($valid_teams)) {
+                    return response()->json(['flash_error' => 'Program points threshold not met or cumulative scores not yet computed!']);
                 }
                 break;
             
